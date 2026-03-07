@@ -1,0 +1,18 @@
+{
+  "root": "dist",
+  "clean_urls": false,
+  "routes": {
+    "/**": "index.html"
+  },
+  "headers": {
+    "/assets/**": {
+      "Cache-Control": "public, max-age=31536000, immutable"
+    },
+    "/**/*.js": {
+      "Content-Type": "application/javascript"
+    },
+    "/**/*.css": {
+      "Content-Type": "text/css"
+    }
+  }
+}
