@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import SyncStatusIndicator from './SyncStatusIndicator';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -11,7 +12,8 @@ const Navbar = () => {
     { path: '/', label: 'Home' },
     { path: '/physics', label: 'Physics Lab' },
     { path: '/playground', label: 'Electrical Playground' },
-    { path: '/astronomy', label: 'Astronomy Lab' }
+    { path: '/astronomy', label: 'Astronomy Lab' },
+    { path: '/notebook', label: 'Lab Notebook' }
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -51,6 +53,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
+                <SyncStatusIndicator />
                 <span className="text-sm text-gray-600">
                   {user.user_metadata?.name || user.email}
                 </span>
