@@ -75,13 +75,13 @@ const ExperimentDashboard = ({ onSelectExperiment }) => {
       {/* Header */}
       <div className="p-12 text-center">
         <h1 className="text-7xl font-bold text-royal-blue mb-6 tracking-wide">
-          VirtuLab AI
+          ExperimentAI
         </h1>
         <p className="text-3xl text-dark-gray mb-4 font-light">
-          Realistic 3D Physics Experiments
+          AI-Powered Virtual Science Laboratory
         </p>
         <p className="text-gray-600 text-xl max-w-3xl mx-auto leading-relaxed">
-          Select an experiment to explore physics concepts with realistic simulations and interactive learning
+          Select an experiment to explore physics concepts with realistic simulations and AI-powered learning assistance
         </p>
       </div>
 
@@ -104,10 +104,10 @@ const ExperimentDashboard = ({ onSelectExperiment }) => {
       {/* Footer */}
       <div className="text-center p-8 border-t border-gray-200 bg-white">
         <p className="text-gray-600 mb-2 text-lg">
-          VirtuLab - Interactive Physics & Electrical Simulations
+          ExperimentAI - AI-Powered Virtual Science Laboratory
         </p>
         <p className="text-gray-500">
-          Learn through hands-on experimentation in a virtual laboratory
+          Learn through hands-on experimentation with AI assistance
         </p>
       </div>
     </div>

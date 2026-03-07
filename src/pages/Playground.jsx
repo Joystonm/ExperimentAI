@@ -5,7 +5,7 @@ import ElectricalPlayground from '../components/ElectricalPlayground';
 const Playground = () => {
   return (
     <motion.div
-      className="h-screen bg-gray-50"
+      className="bg-gray-50"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}

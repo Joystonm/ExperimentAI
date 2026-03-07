@@ -18,6 +18,7 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
   const [parameters, setParameters] = useState({});
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const prompts = {
       pendulum: "Real pendulum physics: d²θ/dt² = -(g/L)sin(θ) - (b/m)(dθ/dt). Adjust parameters to see changes!",
       spring: "Hooke's Law in action: F = -kx. Newton's 2nd Law: F = ma. Watch energy conservation!",
@@ -112,10 +113,10 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
     const experimentControls = controls[experiment.id] || [];
 
     return (
-      <div className="space-y-4">
-        <h4 className="text-lg font-bold text-gray-900">Interactive Parameters</h4>
+      <div className="space-y-3">
+        <h4 className="text-base font-semibold text-gray-900">Interactive Parameters</h4>
         {experimentControls.map(({ param, label, min, max, step }) => (
-          <div key={param} className="space-y-2">
+          <div key={param} className="space-y-1.5">
             <label className="text-sm font-medium text-gray-700">{label}</label>
             <div className="flex items-center space-x-3">
               <input
@@ -127,7 +128,7 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
                 onChange={(e) => handleParameterChange(param, e.target.value)}
                 className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
               />
-              <span className="text-sm font-mono text-gray-600 w-16">
+              <span className="text-sm font-mono text-gray-600 w-14 text-right">
                 {(parameters[param] || min).toFixed(step < 1 ? 2 : 1)}
               </span>
             </div>
@@ -143,25 +144,29 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="h-screen flex flex-col bg-white">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between px-6 py-3">
+      <div className="bg-white border-b border-gray-200">
+        <div className="flex items-center justify-between py-4">
           <div className="flex items-center space-x-4">
             <button
               onClick={onBack}
-              className="flex items-center space-x-2 px-6 py-3 bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 font-medium transition-all duration-200"
+              className="flex items-center space-x-2 px-4 py-2 border border-gray-300 hover:border-gray-400 rounded-lg text-gray-700 text-sm font-medium transition-colors"
             >
-              <span className="text-lg">←</span>
-              <span>Back to Dashboard</span>
+              <span className="text-lg">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </span>
+              <span>Back</span>
             </button>
             
             <div className="border-l border-gray-300 pl-6">
-              <h1 className="text-xl font-bold text-gray-900 flex items-center">
-                <span className="mr-2 text-2xl">{experiment.icon}</span>
+              <h1 className="text-lg font-semibold text-gray-900 flex items-center">
+                
                 {experiment.title}
               </h1>
-              <p className="text-gray-600 text-xs">{experiment.description}</p>
+              <p className="text-gray-600 text-sm">{experiment.description}</p>
             </div>
           </div>
 
@@ -170,17 +175,17 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
               onClick={() => setIsPlaying(!isPlaying)}
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shadow-sm ${
                 isPlaying 
-                  ? 'bg-red-500 hover:bg-red-600 text-white' 
-                  : 'bg-green-500 hover:bg-green-600 text-white'
+                  ? 'bg-black hover:bg-gray-800 text-white' 
+                  : 'bg-black hover:bg-gray-800 text-white'
               }`}
             >
-              {isPlaying ? '⏸️ Pause' : '▶️ Play'}
+              {isPlaying ? 'Pause' : 'Play'}
             </button>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-8 py-4 border-t border-blue-100">
-          <p className="text-blue-800 font-semibold text-xl">{currentPrompt}</p>
+        <div className="bg-gray-50 border-t border-gray-200 py-4">
+          <p className="text-gray-700 text-sm">{currentPrompt}</p>
         </div>
       </div>
 
@@ -215,7 +220,7 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
 
           {/* Live Data Panel */}
           <div className="p-6 border-b border-gray-100">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
               📊 Live Data
             </h3>
             
@@ -225,7 +230,7 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
                   <div key={key} className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-700 font-medium text-sm">{key}</span>
-                      <span className="text-xl font-bold text-blue-600 font-mono">{value}</span>
+                      <span className="text-lg font-semibold text-blue-600 font-mono">{value}</span>
                     </div>
                   </div>
                 ))}

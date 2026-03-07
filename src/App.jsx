@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { LabProvider } from './context/LabContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -15,27 +15,20 @@ import './styles/globals.css';
 function App() {
   return (
     <AuthProvider>
-      <LabProvider>
-        <Router>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <LabProvider>
+          <div className="min-h-screen bg-white">
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/*" element={
-                <ProtectedRoute>
-                  <Navbar />
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/physics" element={<Physics />} />
-                    <Route path="/playground" element={<Playground />} />
-                    <Route path="/astronomy" element={<Astronomy />} />
-                  </Routes>
-                </ProtectedRoute>
-              } />
+              <Route path="/" element={<ProtectedRoute><Navbar /><Home /></ProtectedRoute>} />
+              <Route path="/physics" element={<ProtectedRoute><Navbar /><Physics /></ProtectedRoute>} />
+              <Route path="/playground" element={<ProtectedRoute><Navbar /><Playground /></ProtectedRoute>} />
+              <Route path="/astronomy" element={<ProtectedRoute><Navbar /><Astronomy /></ProtectedRoute>} />
             </Routes>
           </div>
-        </Router>
-      </LabProvider>
+        </LabProvider>
+      </Router>
     </AuthProvider>
   );
 }

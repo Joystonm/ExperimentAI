@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { account } from '../lib/appwrite';
+import { supabase } from '../lib/supabaseClient';
 
 const AuthContext = createContext();
 
@@ -17,12 +17,19 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     checkAuth();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const checkAuth = async () => {
     try {
-      const userData = await account.get();
-      setUser(userData);
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
     } catch (error) {
       setUser(null);
     } finally {
@@ -31,19 +38,39 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
-    await account.createEmailPasswordSession(email, password);
-    const userData = await account.get();
-    setUser(userData);
-    return userData;
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    setUser(data.user);
+    return data.user;
   };
 
   const signup = async (email, password, name) => {
-    await account.create('unique()', email, password, name);
-    return await login(email, password);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name: name,
+        },
+        emailRedirectTo: window.location.origin,
+      },
+    });
+    if (error) throw error;
+    
+    // If email confirmation is required, user will be null
+    if (data.user && data.session) {
+      setUser(data.user);
+    }
+    
+    return data;
   };
 
   const logout = async () => {
-    await account.deleteSession('current');
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
     setUser(null);
   };
 

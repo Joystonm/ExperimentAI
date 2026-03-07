@@ -30,8 +30,11 @@ const ElectricalPlayground = () => {
 
   useEffect(() => {
     drawCanvas();
-    simulateCircuit();
   }, [components, wires, selectedComponent, mousePos]);
+
+  useEffect(() => {
+    simulateCircuit();
+  }, [wires]);
 
   const drawCanvas = () => {
     const canvas = canvasRef.current;
@@ -513,7 +516,7 @@ const ElectricalPlayground = () => {
   };
 
   return (
-    <div className="h-screen flex bg-white">
+    <div className="h-[calc(100vh-4rem)] flex bg-white">
       {/* Left Sidebar */}
       <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col">
         {/* Header */}
