@@ -3,8 +3,14 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import RealisticSimulation from './RealisticSimulation';
 import ElectricalPlayground from './ElectricalPlayground';
+import { usePowerSync } from '../context/PowerSyncContext';
+import { useAuth } from '../context/AuthContext';
+import { analyzeExperiment } from '../lib/mastra/agents';
 
 const ExperimentSimulation = ({ experiment, onBack }) => {
+  const { db } = usePowerSync();
+  const { user } = useAuth();
+  
   // If it's the circuit experiment, render the ElectricalPlayground
   if (experiment.id === 'circuit') {
     return <ElectricalPlayground onBack={onBack} />;
@@ -16,6 +22,8 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
   const [showConceptPanel, setShowConceptPanel] = useState(false);
   const [selectedConcept, setSelectedConcept] = useState('');
   const [parameters, setParameters] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -143,6 +151,83 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
     setShowConceptPanel(true);
   };
 
+  const handleSaveExperiment = async () => {
+    if (!user || !db) return;
+    
+    setIsSaving(true);
+    try {
+      const experimentId = crypto.randomUUID();
+      const now = new Date().toISOString();
+      
+      console.log('Saving experiment:', { experimentId, user_id: user.id });
+      
+      // Save experiment
+      await db.execute(
+        `INSERT INTO experiments (id, user_id, lab_type, experiment_type, title, parameters, measurements, status, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          experimentId,
+          user.id,
+          'physics',
+          experiment.id,
+          experiment.title,
+          JSON.stringify(parameters),
+          JSON.stringify(measurements),
+          'completed',
+          now,
+          now
+        ]
+      );
+      
+      console.log('Experiment saved, waiting for upload to Supabase...');
+      
+      // Wait longer for experiment to upload to Supabase
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      
+      console.log('Generating AI analysis...');
+      
+      // Generate AI analysis
+      const analysis = await analyzeExperiment({
+        lab_type: 'physics',
+        experiment_type: experiment.id,
+        parameters,
+        measurements,
+        results: {}
+      });
+      
+      console.log('AI analysis generated, saving notebook entry...');
+      
+      // Create notebook entry with AI analysis
+      const notebookId = crypto.randomUUID();
+      const content = `Experiment: ${experiment.title}\n\nParameters:\n${Object.entries(parameters).map(([k, v]) => `- ${k}: ${v}`).join('\n')}\n\nMeasurements:\n${Object.entries(measurements).map(([k, v]) => `- ${k}: ${v}`).join('\n')}`;
+      
+      await db.execute(
+        `INSERT INTO notebook_entries (id, user_id, experiment_id, title, content, ai_explanation, graphs, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          notebookId,
+          user.id,
+          experimentId,
+          experiment.title,
+          content,
+          analysis.analysis_text,
+          JSON.stringify([]),
+          now,
+          now
+        ]
+      );
+      
+      console.log('Notebook entry saved successfully');
+      
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error) {
+      console.error('Failed to save experiment:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col bg-white">
       {/* Header */}
@@ -171,6 +256,19 @@ const ExperimentSimulation = ({ experiment, onBack }) => {
           </div>
 
           <div className="flex items-center space-x-2 mr-32">
+            <button
+              onClick={handleSaveExperiment}
+              disabled={isSaving || Object.keys(measurements).length === 0}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shadow-sm ${
+                saveSuccess
+                  ? 'bg-green-500 text-white'
+                  : isSaving || Object.keys(measurements).length === 0
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+            >
+              {saveSuccess ? '✓ Saved' : isSaving ? 'Saving...' : 'Save Experiment'}
+            </button>
             <button
               onClick={() => setIsPlaying(!isPlaying)}
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 shadow-sm ${

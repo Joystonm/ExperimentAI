@@ -1,6 +1,6 @@
 import { usePowerSync } from '../context/PowerSyncContext';
 import { useAuth } from '../context/AuthContext';
-import { experimentAnalyzerWorkflow } from '../lib/mastra/agents';
+import { analyzeExperiment } from '../lib/mastra/agents';
 import { supabase } from '../lib/supabaseClient';
 
 export const useExperiments = () => {
@@ -71,14 +71,12 @@ export const useExperiments = () => {
 
     // Trigger AI analysis workflow
     try {
-      const analysis = await experimentAnalyzerWorkflow.execute({
-        experimentData: {
-          lab_type: experiment.lab_type,
-          experiment_type: experiment.experiment_type,
-          parameters: JSON.parse(experiment.parameters),
-          measurements: JSON.parse(experiment.measurements),
-          results: JSON.parse(experiment.results)
-        }
+      const analysis = await analyzeExperiment({
+        lab_type: experiment.lab_type,
+        experiment_type: experiment.experiment_type,
+        parameters: JSON.parse(experiment.parameters),
+        measurements: JSON.parse(experiment.measurements),
+        results: JSON.parse(experiment.results)
       });
 
       // Store analysis

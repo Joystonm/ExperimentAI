@@ -1,19 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { useExperiments } from '../hooks/useExperiments';
+import { usePowerSync } from '../context/PowerSyncContext';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabaseClient';
 import { motion } from 'framer-motion';
 
 const LabNotebook = () => {
+  const { db } = usePowerSync();
+  const { user } = useAuth();
   const [entries, setEntries] = useState([]);
   const [selectedEntry, setSelectedEntry] = useState(null);
-  const { getNotebookEntries } = useExperiments();
 
   useEffect(() => {
+    if (!user) return;
     loadEntries();
-  }, []);
+    const interval = setInterval(loadEntries, 2000);
+    return () => clearInterval(interval);
+  }, [db, user]);
 
   const loadEntries = async () => {
-    const data = await getNotebookEntries();
-    setEntries(data);
+    if (!user) return;
+    try {
+      // Try local SQLite first (PowerSync), fall back to Supabase
+      let results = [];
+      if (db) {
+        results = await db.getAll(
+          'SELECT * FROM notebook_entries WHERE user_id = ? ORDER BY created_at DESC',
+          [user.id]
+        );
+      }
+      // If local is empty, fetch directly from Supabase
+      if (results.length === 0) {
+        const { data, error } = await supabase
+          .from('notebook_entries')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+        if (!error && data) results = data;
+      }
+      console.log('Loaded notebook entries:', results);
+      const parsedEntries = results.map(entry => ({
+        ...entry,
+        graphs: typeof entry.graphs === 'string' ? JSON.parse(entry.graphs || '[]') : (entry.graphs || [])
+      }));
+      setEntries(parsedEntries);
+    } catch (error) {
+      console.error('Failed to load entries:', error);
+    }
   };
 
   return (
@@ -77,18 +109,48 @@ const LabNotebook = () => {
                   )}
 
                   {selectedEntry.ai_explanation && (
-                    <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                      <div className="flex items-center gap-2 mb-3">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <h3 className="text-sm font-medium text-gray-900">AI Analysis</h3>
+                    <div className="mb-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                        <h3 className="text-base font-semibold text-gray-900">AI Analysis</h3>
                       </div>
-                      <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                        {selectedEntry.ai_explanation}
-                      </p>
+                      <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed">
+                        {selectedEntry.ai_explanation.split('\n').map((line, idx) => {
+                          // Handle headers
+                          if (line.startsWith('####')) {
+                            return <h4 key={idx} className="text-base font-semibold text-gray-900 mt-4 mb-2">{line.replace(/####/g, '').trim()}</h4>;
+                          }
+                          if (line.startsWith('###')) {
+                            return <h3 key={idx} className="text-lg font-semibold text-gray-900 mt-5 mb-3">{line.replace(/###/g, '').trim()}</h3>;
+                          }
+                          // Handle bullet points
+                          if (line.trim().startsWith('- **')) {
+                            const content = line.replace(/^- \*\*/, '').replace(/\*\*:/, ':');
+                            return <li key={idx} className="ml-4 mb-2 text-gray-700">{content}</li>;
+                          }
+                          if (line.trim().startsWith('- ')) {
+                            return <li key={idx} className="ml-4 mb-2 text-gray-700">{line.replace(/^- /, '')}</li>;
+                          }
+                          // Handle bold text
+                          if (line.includes('**')) {
+                            const parts = line.split('**');
+                            return (
+                              <p key={idx} className="mb-2">
+                                {parts.map((part, i) => i % 2 === 1 ? <strong key={i} className="font-semibold text-gray-900">{part}</strong> : part)}
+                              </p>
+                            );
+                          }
+                          // Regular paragraphs
+                          if (line.trim()) {
+                            return <p key={idx} className="mb-2">{line}</p>;
+                          }
+                          return null;
+                        })}
+                      </div>
                     </div>
                   )}
 
-                  {selectedEntry.graphs && selectedEntry.graphs.length > 0 && (
+                  {selectedEntry.graphs && Array.isArray(selectedEntry.graphs) && selectedEntry.graphs.length > 0 && (
                     <div>
                       <h3 className="text-sm font-medium text-gray-700 mb-3">Graphs & Visualizations</h3>
                       <div className="grid grid-cols-2 gap-4">

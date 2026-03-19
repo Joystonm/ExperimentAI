@@ -43,7 +43,7 @@ CREATE TABLE experiment_analyses (
 CREATE TABLE notebook_entries (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  experiment_id UUID REFERENCES experiments(id) ON DELETE CASCADE,
+  experiment_id UUID,
   title TEXT NOT NULL,
   content TEXT,
   ai_explanation TEXT,

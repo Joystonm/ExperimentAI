@@ -1,68 +1,63 @@
-import { Column, ColumnType, Index, IndexedColumn, Schema, Table } from '@journeyapps/powersync-sdk-web';
+import { column, Schema, Table } from '@powersync/web';
 
 // Define PowerSync schema matching Supabase tables
+// Note: id column is automatically created by PowerSync
 const experiments = new Table({
-  id: ColumnType.TEXT,
-  user_id: ColumnType.TEXT,
-  lab_type: ColumnType.TEXT,
-  experiment_type: ColumnType.TEXT,
-  title: ColumnType.TEXT,
-  parameters: ColumnType.TEXT, // JSON stored as TEXT
-  results: ColumnType.TEXT,
-  measurements: ColumnType.TEXT,
-  status: ColumnType.TEXT,
-  created_at: ColumnType.TEXT,
-  updated_at: ColumnType.TEXT,
-  completed_at: ColumnType.TEXT
-}, { indexes: [new Index({ name: 'user_idx', columns: [new IndexedColumn({ name: 'user_id' })] })] });
+  user_id: column.text,
+  lab_type: column.text,
+  experiment_type: column.text,
+  title: column.text,
+  parameters: column.text,
+  results: column.text,
+  measurements: column.text,
+  status: column.text,
+  created_at: column.text,
+  updated_at: column.text,
+  completed_at: column.text
+});
 
 const experiment_analyses = new Table({
-  id: ColumnType.TEXT,
-  experiment_id: ColumnType.TEXT,
-  analysis_text: ColumnType.TEXT,
-  observations: ColumnType.TEXT,
-  conclusions: ColumnType.TEXT,
-  insights: ColumnType.TEXT,
-  generated_at: ColumnType.TEXT
+  experiment_id: column.text,
+  analysis_text: column.text,
+  observations: column.text,
+  conclusions: column.text,
+  insights: column.text,
+  generated_at: column.text
 });
 
 const notebook_entries = new Table({
-  id: ColumnType.TEXT,
-  user_id: ColumnType.TEXT,
-  experiment_id: ColumnType.TEXT,
-  title: ColumnType.TEXT,
-  content: ColumnType.TEXT,
-  ai_explanation: ColumnType.TEXT,
-  graphs: ColumnType.TEXT,
-  created_at: ColumnType.TEXT,
-  updated_at: ColumnType.TEXT
-}, { indexes: [new Index({ name: 'user_idx', columns: [new IndexedColumn({ name: 'user_id' })] })] });
+  user_id: column.text,
+  experiment_id: column.text,
+  title: column.text,
+  content: column.text,
+  ai_explanation: column.text,
+  graphs: column.text,
+  created_at: column.text,
+  updated_at: column.text
+});
 
 const experiment_sessions = new Table({
-  id: ColumnType.TEXT,
-  owner_id: ColumnType.TEXT,
-  experiment_id: ColumnType.TEXT,
-  session_name: ColumnType.TEXT,
-  is_active: ColumnType.INTEGER, // Boolean as INTEGER
-  created_at: ColumnType.TEXT,
-  ended_at: ColumnType.TEXT
+  owner_id: column.text,
+  experiment_id: column.text,
+  session_name: column.text,
+  is_active: column.integer,
+  created_at: column.text,
+  ended_at: column.text
 });
 
 const session_participants = new Table({
-  id: ColumnType.TEXT,
-  session_id: ColumnType.TEXT,
-  user_id: ColumnType.TEXT,
-  joined_at: ColumnType.TEXT,
-  left_at: ColumnType.TEXT
+  session_id: column.text,
+  user_id: column.text,
+  joined_at: column.text,
+  left_at: column.text
 });
 
 const ai_conversations = new Table({
-  id: ColumnType.TEXT,
-  user_id: ColumnType.TEXT,
-  experiment_id: ColumnType.TEXT,
-  messages: ColumnType.TEXT,
-  created_at: ColumnType.TEXT,
-  updated_at: ColumnType.TEXT
+  user_id: column.text,
+  experiment_id: column.text,
+  messages: column.text,
+  created_at: column.text,
+  updated_at: column.text
 });
 
 export const AppSchema = new Schema({

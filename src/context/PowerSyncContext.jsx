@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { powerSyncDb, initPowerSync, disconnectPowerSync } from '../lib/powersync/db';
+import { powerSyncDb, initPowerSync, disconnectPowerSync, clearPowerSync } from '../lib/powersync/db';
 import { useAuth } from './AuthContext';
 
 const PowerSyncContext = createContext();
@@ -23,18 +23,22 @@ export const PowerSyncProvider = ({ children }) => {
         setIsConnected(true);
       });
 
-      // Listen to sync status
-      const statusListener = powerSyncDb.registerListener({
-        statusChanged: (status) => {
-          setIsSyncing(status.connected && status.downloading);
-        }
-      });
+      const checkStatus = () => {
+        const status = powerSyncDb.currentStatus;
+        setIsSyncing(status?.connected && status?.downloading);
+      };
+
+      const interval = setInterval(checkStatus, 1000);
 
       return () => {
-        statusListener();
-        disconnectPowerSync();
+        clearInterval(interval);
+        disconnectPowerSync(); // just disconnect, keep local data intact
         setIsConnected(false);
       };
+    } else {
+      // user logged out — wipe local DB
+      clearPowerSync();
+      setIsConnected(false);
     }
   }, [user]);
 

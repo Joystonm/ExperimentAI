@@ -5,8 +5,7 @@
   "dependencies": {
     "@emotion/is-prop-valid": "^1.4.0",
     "@emotion/styled": "^11.14.1",
-    "@journeyapps/powersync-sdk-web": "^1.8.0",
-    "@mastra/core": "^0.1.0",
+    "@powersync/web": "^1.35.0",
     "@react-three/drei": "^9.88.0",
     "@react-three/fiber": "^8.15.0",
     "@supabase/supabase-js": "^2.39.0",

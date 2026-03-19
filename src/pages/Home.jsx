@@ -194,9 +194,6 @@ const Home = () => {
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
           <h2 className="text-4xl font-semibold text-gray-900 mb-4">Start Running Experiments in Minutes</h2>
           <p className="text-lg text-gray-600 mb-8">No installation required. Access the full lab directly in your browser.</p>
-          <Link to="/signup" className="inline-block px-8 py-4 bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition-colors">
-            Get Started Free
-          </Link>
         </div>
       </section>
 
