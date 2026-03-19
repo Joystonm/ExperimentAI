@@ -4,6 +4,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: './',
+  define: {
+    'process.env': {}
+  },
+  optimizeDeps: {
+    exclude: ['@powersync/web']
+  },
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -26,5 +32,8 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  worker: {
+    format: 'es'
   }
 })
