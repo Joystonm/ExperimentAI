@@ -1,16 +1,7 @@
-# ExperimentAI - Local-First AI Science Laboratory
+# ExperimentAI
 
-**PowerSync AI Hackathon Submission**
 
 ExperimentAI is a local-first AI-powered virtual science laboratory that enables students to perform physics, electrical, and astronomy experiments with real-time AI assistance, offline capability, and collaborative features.
-
-## 🏆 Hackathon Prize Categories
-
-This project is eligible for:
-- **Core Prizes** (1st/2nd/3rd place)
-- **Best Local-First Submission** - Fully offline-capable with local SQLite + PowerSync sync
-- **Best Submission Using Supabase** - Complete backend on Supabase 
-- **Best Submission Using Mastra** - AI agents for experiment analysis and lab assistance
 
 ## ✨ Key Features
 
@@ -68,11 +59,6 @@ This project is eligible for:
 - Tavily API key
 
 ### Installation
-
-```bash
-# Clone repository
-git clone https://github.com/yourusername/ExperimentAI.git
-cd ExperimentAI
 
 # Install dependencies
 npm install
